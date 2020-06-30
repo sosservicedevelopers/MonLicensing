@@ -1,0 +1,95 @@
+﻿@page "/login"
+@page "/login/{Errorstring}"
+
+@using System.ComponentModel.DataAnnotations;
+@using MonLicensing.Models
+@using System.Web;
+@using Microsoft.AspNetCore.Identity;
+@inject UserManager<ApplicationUser> _userManager;
+@inject SignInManager<ApplicationUser> _signInManager;
+@inject NavigationManager Navigation
+
+
+<AuthorizeView Roles="Admin, superuser">
+    <p>You are admin</p>
+</AuthorizeView>
+
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+        <h4>Вход в систему</h4>
+    </div>
+    <div class="col-md-3"></div>
+</div>
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <EditForm Model="@user" OnValidSubmit="@Enter">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="form-group">
+                        <input type="text" placeholder="Логин" class="form-control" @bind="@user.UserName" />
+                        @*<ValidationMessage For="@(() => user.UserName)" />*@
+                    </div>
+                    <div class="form-group">
+                        <input type="password" placeholder="Пароль" class="form-control" @bind="@user.Password" />
+                        @*<ValidationMessage For="@(() => user.Password)" />*@
+                    </div>
+                    <p class="text-danger">@Errorstring</p>
+                    <input type="submit" class="btn btn-primary" value="Вход" />
+
+
+                </EditForm>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-3"></div>
+</div>
+
+
+@code {
+
+
+    [Parameter]
+    public string Errorstring { get; set; } = "";
+    public class InputUser
+    {
+        [Required(ErrorMessage = "Имя пользователя обязательно")]
+        public string UserName { get; set; }
+        [Required(ErrorMessage = "Пароль обязательно")]
+        public string Password { get; set; }
+    }
+
+    private InputUser user = new InputUser();
+
+    private void Enter()
+    {
+        if (!string.IsNullOrEmpty(user.UserName) && !string.IsNullOrEmpty(user.Password))
+        {
+            Navigation.NavigateTo($"/SignIn?Email={user.UserName}&Password={user.Password}", true);
+            //UriHelper.NavigateTo($"/materials/{MaterialId}/display");
+        }
+        else
+        {
+            Navigation.NavigateTo("/");
+           // return Redirect("~/");
+            Errorstring = "Не удалось авторизоваться!";
+
+        }
+
+    }
+    protected override void OnInitialized()
+    {
+
+        // janrs = _db.Janr.ToList();
+    }
+
+    //protected override  Task OnInitializedAsync()
+    //{
+    //    movies = await _db.Movies.();
+    //}
+}

@@ -1,0 +1,161 @@
+﻿@page "/conclusionlist"
+
+@using Microsoft.AspNetCore.Identity;
+@using MonLicensing.Data
+@using MonLicensing.Models
+@using Radzen.Blazor;
+@inject UserManager<ApplicationUser> _userManager;
+
+@inject ApplicationDbContext db
+
+
+    <h3>Заключения уполномоченного государственного органа</h3>
+<button class="btn btn-success" @onclick="AddNew">Добавить новый</button>
+<RadzenGrid AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+            AllowSorting="true" Data="@сonclusions" TItem="Conclusions" ColumnWidth="150px">
+    <Columns>
+        <RadzenGridColumn TItem="Conclusions" Property="Name" Title="Наименование"></RadzenGridColumn>
+        <RadzenGridColumn TItem="Conclusions" Property="Desc" Title="Примечание"></RadzenGridColumn>
+      
+        @*<RadzenGridColumn TItem="IdentityRole" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">*@
+        <RadzenGridColumn TItem="Conclusions" TextAlign="Radzen.TextAlign.Center" Width="60px" >
+            <Template Context="сonclusion">
+                <RadzenButton Icon="edit" Click="@(args => Edit(сonclusion))" />
+            </Template>
+        </RadzenGridColumn>
+        <RadzenGridColumn TItem="Conclusions" TextAlign="Radzen.TextAlign.Center" Width="60px">
+            <Template Context="сonclusion">
+                <RadzenButton Icon="delete" Click="@(args => Delete(сonclusion))" />
+            </Template>
+        </RadzenGridColumn>
+    </Columns>
+</RadzenGrid>
+
+
+@if (ShowPopup)
+{
+    <div class="modal" tabindex="-1" style="display:block" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">@title</h3>
+                    <button type="button" class="close"
+                            @onclick="ClosePopup">
+                        <span aria-hidden="true">X</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <span style="color:red">@strError</span>
+                    <table class="table">
+                        <tr>
+                            <td>Наименование</td>
+                            <td><input type="text" class="form-control" @bind="@сonclusion.Name" /></td>
+                        </tr>
+
+                        <tr>
+                            <td>Примечание</td>
+                            <td><input type="text" class="form-control" @bind="@сonclusion.Desc" /></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <button class="btn btn-primary" @onclick="Save">
+                                    Сохранить
+                                </button>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@code {
+
+    private List<Conclusions> сonclusions= new List<Conclusions>();
+
+    private Conclusions сonclusion = new Conclusions();
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    System.Security.Claims.ClaimsPrincipal CurrentUser;
+
+    ApplicationUser objUser;
+    string strError = "";
+    string title = "";
+    bool ShowPopup = false;
+
+
+    void AddNew()
+    {
+        сonclusion = new Conclusions();
+        сonclusion.Id = 0;
+        title = "Новоя запись";
+        ShowPopup = true;
+    }
+    async Task Save()
+    {
+        try
+        {
+            if (сonclusion.Id != 0)
+            {
+                Conclusions lt = await db.Conclusions.FindAsync(сonclusion.Id);
+                lt.Name = сonclusion.Name;
+                lt.Desc= сonclusion.Desc;
+                await db.SaveChangesAsync();
+            }
+            else
+            {
+                db.Conclusions.Add(сonclusion);
+                await db.SaveChangesAsync();
+            }
+
+            ShowPopup = false;
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            strError = ex.GetBaseException().Message;
+        }
+    }
+    async Task Edit(Conclusions lt)
+    {
+        title = "Редактирование";
+        сonclusion = lt;
+        ShowPopup = true;
+    }
+    async Task Delete(Conclusions lt)
+    {
+        ShowPopup = false;
+        var obj = await db.Conclusions.FindAsync(lt.Id);
+        if (obj != null)
+        {
+            db.Conclusions.Remove(obj);
+            await db.SaveChangesAsync();
+        }
+        LoadData();
+    }
+    void ClosePopup()
+    {
+        ShowPopup = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // CurrentUser = (await authenticationStateTask).User;
+        // objUser = await _userManager.FindByNameAsync(CurrentUser.Identity.Name);
+        LoadData();
+    }
+
+    public void LoadData()
+    {
+        сonclusion = new Conclusions();
+        сonclusions = db.Conclusions.OrderBy(x => x.Name).ToList();
+
+    }
+
+
+}

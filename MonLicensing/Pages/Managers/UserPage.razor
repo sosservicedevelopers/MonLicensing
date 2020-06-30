@@ -1,0 +1,261 @@
+﻿@page "/registers"
+@using Microsoft.AspNetCore.Identity;
+@using MonLicensing.Models;
+@using MonLicensing.Data;
+@inject ApplicationDbContext db;
+@inject UserManager<ApplicationUser> _userManager;
+@inject MonLicensing.Services.EmailService emailService;
+
+
+
+<h3>Пользователи</h3>
+<button class="btn btn-success" @onclick="AddNewUser">Добавить новый</button>
+
+<RadzenGrid AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+            AllowSorting="true" Data="@users" TItem="ApplicationUser" ColumnWidth="150px">
+    <Columns>
+        <RadzenGridColumn TItem="ApplicationUser" Property="UserName" Title="E-mail"></RadzenGridColumn>
+        <RadzenGridColumn TItem="ApplicationUser" Property="CompanyName" Title="Учреждения"></RadzenGridColumn>
+        <RadzenGridColumn TItem="ApplicationUser" Property="INN" Title="ИНН"></RadzenGridColumn>
+        <RadzenGridColumn TItem="ApplicationUser" TextAlign="Radzen.TextAlign.Center" Width="60px">
+            <Template Context="objUser">
+                <RadzenButton Icon="edit" Click="@(args => EditUser(objUser))" />
+            </Template>
+        </RadzenGridColumn>
+        <RadzenGridColumn TItem="ApplicationUser" TextAlign="Radzen.TextAlign.Center" Width="60px">
+            <Template Context="objUser">
+                <RadzenButton Icon="delete" Click="@(args => DeleteUser(objUser))" />
+            </Template>
+        </RadzenGridColumn>
+    </Columns>
+</RadzenGrid>
+
+
+@if (ShowPopup)
+{
+    @*<input class="form-control" type="password" placeholder="Password" @bind="objUser.PasswordHash" />*@
+    <div class="modal" tabindex="-1" style="display:block" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">@title</h3>
+                    <button type="button" class="close"
+                            @onclick="ClosePopup">
+                        <span aria-hidden="true">X</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <span style="color:red">@strError</span>
+                    <table class="table">
+                        <tr>
+                            <td>Е-майл</td>
+                            <td><input type="text" class="form-control" @bind="@objUser.UserName" /></td>
+                        </tr>
+                        <tr>
+                            <td>Учреждения</td>
+                            <td><input type="text" class="form-control" @bind="@objUser.CompanyName" /></td>
+                        </tr>
+                        <tr>
+                            <td>ИНН</td>
+                            <td><input type="text" class="form-control" @bind="@objUser.INN" /></td>
+                        </tr>
+                        <tr>
+                            <td>Пароль</td>
+                            <td><input class="form-control" type="password" placeholder="Password" @bind="objUser.PasswordHash" /></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <button class="btn btn-primary" @onclick="SaveUser">
+                                    Сохранить
+                                </button>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    string ADMINISTRATION_ROLE = "Admin";
+    System.Security.Claims.ClaimsPrincipal CurrentUser;
+
+    ApplicationUser objUser = new ApplicationUser();
+    string CurrentUserRole { get; set; } = "Users";
+    string title = "";
+    string strError = "";
+    bool ShowPopup = false;
+    List<ApplicationUser> users = new List<ApplicationUser>();
+
+    public void GetUsers()
+    {
+        users = new List<ApplicationUser>();
+        var user = _userManager.Users.Select(x => new ApplicationUser
+        {
+            Id = x.Id,
+            UserName = x.UserName,
+            CompanyName = x.CompanyName,
+            INN = x.INN,
+            PasswordHash = "*****"
+        });
+        foreach (var item in user)
+        {
+            users.Add(item);
+        }
+        objUser = new ApplicationUser();
+    }
+
+    void AddNewUser()
+    {
+        objUser = new ApplicationUser();
+        objUser.PasswordHash = "*****";
+        objUser.Id = "";
+        title = "Добавление нового пользователя";
+        ShowPopup = true;
+    }
+    async Task SaveUser()
+    {
+        try
+        {
+            if (objUser.Id != "")
+            {
+                var user = await _userManager.FindByIdAsync(objUser.Id);
+                user.UserName = objUser.UserName;
+                user.CompanyName = objUser.CompanyName;
+                user.INN = objUser.INN;
+                await _userManager.UpdateAsync(user);
+                if (objUser.PasswordHash != "*****")
+                {
+                    var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    var passworduser = await _userManager.ResetPasswordAsync(
+                            user,
+                            resetToken,
+                            objUser.PasswordHash);
+                    if (!passworduser.Succeeded)
+                    {
+                        if (passworduser.Errors.FirstOrDefault() != null)
+                        {
+                            strError = passworduser.Errors.FirstOrDefault().Description;
+                        }
+                        else
+                        {
+                            strError = "Pasword error";
+                        }
+                        return;
+                    }
+                }
+                await _userManager.AddToRoleAsync(user, CurrentUserRole);
+                //var UserResult = await _userManager.IsInRoleAsync(user, ADMINISTRATION_ROLE);
+                //if ((CurrentUserRole == ADMINISTRATION_ROLE) & (!UserResult))
+                //{
+                //    await _userManager.AddToRoleAsync(user, ADMINISTRATION_ROLE);
+                //}
+                //else
+                //{
+                //    await _userManager.AddToRoleAsync(user, CurrentUserRole);
+                //    //// Is Administrator role not selected // but user is an Administrator?
+                //    //if ((CurrentUserRole != ADMINISTRATION_ROLE) & (UserResult))
+                //    //{
+                //    //    // Remove user from Administrator role
+                //    //    await _userManager.RemoveFromRoleAsync(user, ADMINISTRATION_ROLE);
+                //    //}
+                //}
+            }
+            else
+            {
+                var NewUser = new ApplicationUser
+                {
+                    UserName = objUser.UserName,
+                    CompanyName = objUser.CompanyName,
+                    INN = objUser.INN
+                };
+                var CreateResult = await _userManager.CreateAsync(NewUser, objUser.PasswordHash);
+                if (!CreateResult.Succeeded)
+                {
+                    if (CreateResult.Errors.FirstOrDefault() != null)
+                    {
+                        strError = CreateResult.Errors.FirstOrDefault().Description;
+                    }
+                    else
+                    {
+                        strError = "Create error";
+                    }
+                    // Keep the popup opened
+                    return;
+                }
+                else
+                {
+                    // Handle Roles
+                    //if (CurrentUserRole == ADMINISTRATION_ROLE)
+                    //{
+                    // Put admin in Administrator role
+                    await _userManager.AddToRoleAsync(NewUser, CurrentUserRole);
+                    //}
+                    Random rnd = new Random();
+                    string message= "<div> Добро пожаловать в портал лицензирования!</div>" +
+                        "<div> http://licensing.edu.gov.kg/ </div>" +
+                        "<div> Ваш логин: "+NewUser.UserName+(char)10+ "</div> <div> Ваш пароль: " + "L$Pwds+" + rnd.Next(10, 100)+ "</div>";
+                    await emailService.SendEmailAsync(NewUser.UserName, "Регистраия по лицензированию", message);
+                }
+            }
+            // Close the Popup
+            ShowPopup = false;
+            // Refresh Users
+            GetUsers();
+        }
+        catch (Exception ex)
+        {
+            strError = ex.GetBaseException().Message;
+        }
+    }
+    async Task EditUser(ApplicationUser _IdentityUser)
+    {
+        // Set the selected user as the current user
+        objUser = _IdentityUser;
+        // Get the user
+        var user = await _userManager.FindByIdAsync(objUser.Id);
+        if (user != null)
+        {
+            CurrentUserRole = "Manager";
+            // Is user in administrator role?
+            //var UserResult =await _userManager.IsInRoleAsync(user, ADMINISTRATION_ROLE);
+            //if (UserResult)
+            //{
+            //    CurrentUserRole = ADMINISTRATION_ROLE;
+            //}
+            //else
+            //{
+            //    CurrentUserRole = "Manager";
+            //}
+        }
+        // Open the Popup
+        ShowPopup = true;
+    }
+    async Task DeleteUser(ApplicationUser duser)
+    {
+        ShowPopup = false;
+        var user = await _userManager.FindByIdAsync(duser.Id);
+        if (user != null)
+        {
+            await _userManager.DeleteAsync(user);
+        }
+        GetUsers();
+    }
+    void ClosePopup()
+    {
+        ShowPopup = false;
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        GetUsers();
+    }
+
+}

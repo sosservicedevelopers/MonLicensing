@@ -1,0 +1,96 @@
+﻿
+<div class="top-row pl-4 navbar navbar-dark">
+    <a class="navbar-brand" href="">Лицензирование </a>
+    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+
+
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Главная
+            </NavLink>
+        </li>
+        <AuthorizeView Roles="Admin">
+            <li class="nav-item px-3">
+                <MatNavMenu Multi="true" Class="app-sidebar">
+                    <MatNavMenu Multi="true" Class="app-sidebar">
+                        <MatNavItem Href="registers">
+                            <MatIcon>home</MatIcon> <span class="miniHover">Пользователи</span>
+                        </MatNavItem>
+                    </MatNavMenu>
+
+                    <MatNavSubMenu>
+                        <MatNavSubMenuHeader>
+                            <MatNavItem AllowSelection="false">
+                                <NavLink class="nav-link" href="">
+                                    <span class="oi oi-list-rich" aria-hidden="true"></span> Справочники
+                                </NavLink>
+                            </MatNavItem>
+                        </MatNavSubMenuHeader>
+                        <MatNavSubMenuList>
+                            <MatNavItem Href="eduproglist">
+                                <MatIcon>send</MatIcon> <span class="miniHover">Программы</span>
+                            </MatNavItem>
+                            <MatNavItem Href="conclusionlist">
+                                <MatIcon>inbox</MatIcon>  Заключения
+                            </MatNavItem>
+                            <MatNavItem Href="legalformlist">
+                                <MatIcon>inbox</MatIcon>  Форма
+                            </MatNavItem>
+                            <MatNavItem Href="deniallist">
+                                <MatIcon>inbox</MatIcon>  Отказ
+                            </MatNavItem>
+                            <MatNavItem Href="reissuininglist">
+                                <MatIcon>inbox</MatIcon>  Переоформление
+                            </MatNavItem>
+                            <MatNavItem Href="imlist">
+                                <MatIcon>inbox</MatIcon>  Меры воздействия
+                            </MatNavItem>
+
+
+                        </MatNavSubMenuList>
+                    </MatNavSubMenu>
+                </MatNavMenu>
+            </li>
+
+            @*<li class="nav-item px-3">
+                <NavLink class="nav-link" href="licences_typelist">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+                </NavLink>
+            </li>*@
+        </AuthorizeView>
+
+        <AuthorizeView Roles="Manager">
+            <li class="nav-item px-3">
+                <MatNavMenu Multi="true" Class="app-sidebar">
+                    <MatNavItem Href="registers">
+                        <MatIcon>home</MatIcon> <span class="miniHover">Регистрация</span>
+                    </MatNavItem> 
+                </MatNavMenu>
+            </li>
+
+            @*<li class="nav-item px-3">
+                <NavLink class="nav-link" href="licences_typelist">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+                </NavLink>
+            </li>*@
+        </AuthorizeView>
+    </ul>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}
