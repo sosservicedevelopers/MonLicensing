@@ -15,7 +15,10 @@ namespace MonLicensing.Data
         public DbSet<Denial> Denial { get; set; }
         public DbSet<Reissuining> Reissuining { get; set; }
         public DbSet<ImpactMeasures> ImpactMeasures { get; set; }
-        
+
+        public DbSet<Processes> Processes { get; set; }
+        public DbSet<LicenceType> LicenceType { get; set; }
+
 
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)

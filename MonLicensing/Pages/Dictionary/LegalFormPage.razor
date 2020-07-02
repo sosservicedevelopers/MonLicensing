@@ -18,14 +18,14 @@
         <RadzenGridColumn TItem="LegalForm" Property="Desc" Title="Примечание"></RadzenGridColumn>
       
         @*<RadzenGridColumn TItem="IdentityRole" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">*@
-        <RadzenGridColumn TItem="LegalForm" TextAlign="Radzen.TextAlign.Center" Width="60px" >
+    <RadzenGridColumn TItem="LegalForm" TextAlign="Radzen.TextAlign.Center" Title="Редактировать" Width="60px">
+        <Template Context="сonclusion">
+            <RadzenButton Click="@(args => Edit(сonclusion))"> <span class="oi oi-pencil" aria-hidden="true"></span> </RadzenButton>
+        </Template>
+    </RadzenGridColumn>
+        <RadzenGridColumn TItem="LegalForm" TextAlign="Radzen.TextAlign.Center" Title="Удалить" Width="60px">
             <Template Context="сonclusion">
-                <RadzenButton Icon="edit" Click="@(args => Edit(сonclusion))" />
-            </Template>
-        </RadzenGridColumn>
-        <RadzenGridColumn TItem="LegalForm" TextAlign="Radzen.TextAlign.Center" Width="60px">
-            <Template Context="сonclusion">
-                <RadzenButton Icon="delete" Click="@(args => Delete(сonclusion))" />
+                <RadzenButton  Click="@(args => Delete(сonclusion))"><span class="oi oi-trash" aria-hidden="true"></span></RadzenButton>
             </Template>
         </RadzenGridColumn>
     </Columns>

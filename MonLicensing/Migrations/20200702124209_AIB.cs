@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace MonLicensing.Migrations
 {
-    public partial class inits : Migration
+    public partial class AIB : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -118,6 +118,34 @@ namespace MonLicensing.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_LegalForm", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LicenceType",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(maxLength: 150, nullable: false),
+                    Desc = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LicenceType", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Processes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(maxLength: 150, nullable: false),
+                    Desc = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Processes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -309,6 +337,12 @@ namespace MonLicensing.Migrations
 
             migrationBuilder.DropTable(
                 name: "LegalForm");
+
+            migrationBuilder.DropTable(
+                name: "LicenceType");
+
+            migrationBuilder.DropTable(
+                name: "Processes");
 
             migrationBuilder.DropTable(
                 name: "Reissuining");

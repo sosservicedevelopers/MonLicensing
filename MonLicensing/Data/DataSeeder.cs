@@ -71,32 +71,55 @@ namespace MonLicensing.Data
                     context.SaveChanges();
 
                 }
-                    //if (!context.Hospitals.Any())
-                    //{
-                    //    Assembly assembly = Assembly.GetExecutingAssembly();
-                    //    string resourceName = "ExExPostAis.Data.ipu.csv";
-                    //    using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-                    //    {
-                    //        using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
-                    //        {
-                    //            CsvReader csvReader = new CsvReader(reader, CultureInfo.InvariantCulture);
-                    //            //csvReader.Configuration.HeaderValidated = false;
-                    //            var departments = csvReader.GetRecords<Hospitals>().ToArray();
-                    //            //context.Departments.AddOrUpdate(c => c.Code, countries);
-                    //            foreach (Hospitals record in departments)
-                    //            {
-                    //                context.Hospitals.Add(record);
-                    //            }
-                    //            context.SaveChanges();
-                    //        }
-                    //    }
-
-                    //}
-
-
-
+                if (!context.Processes.Any())
+                {
+                    context.Processes.Add(new Processes() { Name = "Выдача лицензии" });
+                    context.Processes.Add(new Processes() { Name = "Отказ в выдаче лицензии" });
+                    context.Processes.Add(new Processes() { Name = "Переоформление лицензии" });
+                    context.Processes.Add(new Processes() { Name = "Выдача дубликата лицензии" });
+                    context.Processes.Add(new Processes() { Name = "Признание" });
+                    context.Processes.Add(new Processes() { Name = "Приостановление" });
+                    context.Processes.Add(new Processes() { Name = "Возобновление" });
+                    context.Processes.Add(new Processes() { Name = "Аннулирование" });
+                    context.SaveChanges();
 
                 }
+                if (!context.Processes.Any())
+                {
+                    context.LicenceType.Add(new LicenceType() { Name = "Медицинская деятельность" });
+                    context.LicenceType.Add(new LicenceType() { Name = "Фармацевтическая деятельность" });
+                    context.LicenceType.Add(new LicenceType() { Name = "Работа с микроорганизмами II группы патогенности" });
+                    context.LicenceType.Add(new LicenceType() { Name = "Образовательная деятельность" });
+                   
+                    context.SaveChanges();
+
+                }
+                //if (!context.Hospitals.Any())
+                //{
+                //    Assembly assembly = Assembly.GetExecutingAssembly();
+                //    string resourceName = "ExExPostAis.Data.ipu.csv";
+                //    using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+                //    {
+                //        using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
+                //        {
+                //            CsvReader csvReader = new CsvReader(reader, CultureInfo.InvariantCulture);
+                //            //csvReader.Configuration.HeaderValidated = false;
+                //            var departments = csvReader.GetRecords<Hospitals>().ToArray();
+                //            //context.Departments.AddOrUpdate(c => c.Code, countries);
+                //            foreach (Hospitals record in departments)
+                //            {
+                //                context.Hospitals.Add(record);
+                //            }
+                //            context.SaveChanges();
+                //        }
+                //    }
+
+                //}
+
+
+
+
+            }
             catch (Exception exp){
                 var loggerFactory = LoggerFactory.Create(builder =>
                 {

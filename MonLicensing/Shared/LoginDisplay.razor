@@ -2,14 +2,14 @@
     <Authorized>
         <a href="Identity/Account/Manage">Здравствуйте, @context.User.Identity.Name!</a>
         <form method="post" action="Identity/Account/LogOut">
-            <button type="submit" class="nav-link btn btn-link">Log out</button>
+            <button type="submit" class="nav-link btn btn-link">    <span class="oi oi-account-logout" aria-hidden="true"></span>  &nbsp;  Выйти  </button>
         </form>
     </Authorized>
     <NotAuthorized>
         @*<a href="Identity/Account/Register">Register</a>*@
         @*<a href="Identity/Account/Login">Log in</a>*@
         <NavLink class="nav-link" href="login">
-            <span class="oi oi-person" aria-hidden="true"></span>&nbsp; Вход
+            Вход      &nbsp;       <span class="oi oi-account-login" aria-hidden="true"></span>
         </NavLink>
     </NotAuthorized>
 </AuthorizeView>

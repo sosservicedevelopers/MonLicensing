@@ -1,4 +1,4 @@
-﻿@page "/deniallist"
+﻿@page "/licencetypelist"
 
 @using Microsoft.AspNetCore.Identity;
 @using MonLicensing.Data
@@ -9,25 +9,25 @@
 @inject ApplicationDbContext db
 
 
-    <h3>Отказ в выдаче лицензии</h3>
+    <h3>Процессы</h3>
 <button class="btn btn-success" @onclick="AddNew">Добавить новый</button>
 <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
-            AllowSorting="true" Data="@сonclusions" TItem="Denial" ColumnWidth="150px">
+            AllowSorting="true" Data="@сonclusions" TItem="LicenceType" ColumnWidth="150px">
     <Columns>
-        <RadzenGridColumn TItem="Denial" Property="Name" Title="Наименование"></RadzenGridColumn>
-        <RadzenGridColumn TItem="Denial" Property="Desc" Title="Примечание"></RadzenGridColumn>
+        <RadzenGridColumn TItem="LicenceType" Property="Name" Title="Наименование"></RadzenGridColumn>
+        <RadzenGridColumn TItem="LicenceType" Property="Desc" Title="Примечание"></RadzenGridColumn>
       
         @*<RadzenGridColumn TItem="IdentityRole" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">*@
-        <RadzenGridColumn TItem="Denial" TextAlign="Radzen.TextAlign.Center" Width="60px" Title="Редактировать"  >
-            <Template Context="сonclusion">
-                <RadzenButton  Click="@(args => Edit(сonclusion))"> <span class="oi oi-pencil" aria-hidden="true"></span> </RadzenButton>
-            </Template>
-        </RadzenGridColumn>
-        <RadzenGridColumn TItem="Denial" TextAlign="Radzen.TextAlign.Center" Width="60px" Title="Удалить">
-            <Template Context="сonclusion">
-                <RadzenButton  Click="@(args => Delete(сonclusion))"><span class="oi oi-trash" aria-hidden="true"></span></RadzenButton>
-            </Template>
-        </RadzenGridColumn>
+    <RadzenGridColumn TItem="LicenceType" TextAlign="Radzen.TextAlign.Center" Title="Редактировать" Width="60px">
+        <Template Context="сonclusion">
+            <RadzenButton Click="@(args => Edit(сonclusion))"> <span class="oi oi-pencil" aria-hidden="true"></span> </RadzenButton>
+        </Template>
+    </RadzenGridColumn>
+    <RadzenGridColumn TItem="LicenceType" TextAlign="Radzen.TextAlign.Center" Title="Удалить" Width="60px">
+        <Template Context="сonclusion">
+            <RadzenButton  Click="@(args => Delete(сonclusion))"><span class="oi oi-trash" aria-hidden="true"></span></RadzenButton>
+        </Template>
+    </RadzenGridColumn>
     </Columns>
 </RadzenGrid>
 
@@ -75,9 +75,9 @@
 
 @code {
 
-    private List<Denial> сonclusions= new List<Denial>();
+    private List<LicenceType> сonclusions= new List<LicenceType>();
 
-    private Denial сonclusion = new Denial();
+    private LicenceType сonclusion = new LicenceType();
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -91,7 +91,7 @@
 
     void AddNew()
     {
-        сonclusion = new Denial();
+        сonclusion = new LicenceType();
         сonclusion.Id = 0;
         title = "Новоя запись";
         ShowPopup = true;
@@ -102,14 +102,14 @@
         {
             if (сonclusion.Id != 0)
             {
-                Denial lt = await db.Denial.FindAsync(сonclusion.Id);
+                LicenceType lt = await db.LicenceType.FindAsync(сonclusion.Id);
                 lt.Name = сonclusion.Name;
                 lt.Desc= сonclusion.Desc;
                 await db.SaveChangesAsync();
             }
             else
             {
-                db.Denial.Add(сonclusion);
+                db.LicenceType.Add(сonclusion);
                 await db.SaveChangesAsync();
             }
 
@@ -121,19 +121,19 @@
             strError = ex.GetBaseException().Message;
         }
     }
-    async Task Edit(Denial lt)
+    async Task Edit(LicenceType lt)
     {
         title = "Редактирование";
         сonclusion = lt;
         ShowPopup = true;
     }
-    async Task Delete(Denial lt)
+    async Task Delete(LicenceType lt)
     {
         ShowPopup = false;
-        var obj = await db.Denial.FindAsync(lt.Id);
+        var obj = await db.LicenceType.FindAsync(lt.Id);
         if (obj != null)
         {
-            db.Denial.Remove(obj);
+            db.LicenceType.Remove(obj);
             await db.SaveChangesAsync();
         }
         LoadData();
@@ -152,8 +152,8 @@
 
     public void LoadData()
     {
-        сonclusion = new Denial();
-        сonclusions = db.Denial.OrderBy(x => x.Name).ToList();
+        сonclusion = new LicenceType();
+        сonclusions = db.LicenceType.OrderBy(x => x.Name).ToList();
 
     }
 
