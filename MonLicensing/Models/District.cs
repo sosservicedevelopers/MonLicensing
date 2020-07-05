@@ -6,13 +6,17 @@ using System.Threading.Tasks;
 
 namespace MonLicensing.Models
 {
-    public class LicenceType
+    public class District
     {
         public int Id { get; set; }
         [Required(ErrorMessage ="Обязательное поле")]
-        [MinLength(5,ErrorMessage ="Минимальная длина составляет 5 символов")]
-        [StringLength(150,MinimumLength =5, ErrorMessage = "Минимальная длина составляет 5 символов")]
+        [Display(Name = "Район")]
         public string Name { get; set; }
-        public string Desc { get; set; }
+
+        [Display(Name = "Область")]
+        public int RegionId { get; set; }
+
+        [Display(Name = "Область")]
+        public Region Region { get; set; }
     }
 }

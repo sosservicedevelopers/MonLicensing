@@ -84,16 +84,7 @@ namespace MonLicensing.Data
                     context.SaveChanges();
 
                 }
-                if (!context.Processes.Any())
-                {
-                    context.LicenceType.Add(new LicenceType() { Name = "Медицинская деятельность" });
-                    context.LicenceType.Add(new LicenceType() { Name = "Фармацевтическая деятельность" });
-                    context.LicenceType.Add(new LicenceType() { Name = "Работа с микроорганизмами II группы патогенности" });
-                    context.LicenceType.Add(new LicenceType() { Name = "Образовательная деятельность" });
-                   
-                    context.SaveChanges();
-
-                }
+              
                 //if (!context.Hospitals.Any())
                 //{
                 //    Assembly assembly = Assembly.GetExecutingAssembly();

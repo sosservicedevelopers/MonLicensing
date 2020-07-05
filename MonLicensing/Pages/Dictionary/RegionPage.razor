@@ -1,4 +1,4 @@
-﻿@page "/eduproglist"
+﻿@page "/regionlist"
 @attribute [Authorize]
 
 @using Microsoft.AspNetCore.Identity;
@@ -10,23 +10,23 @@
 @inject ApplicationDbContext db
 
 
-<h3>Образовательные программы для лицензирования</h3>
+<h3>Область</h3>
 <button class="btn btn-success" @onclick="AddNew">Добавить новый</button>
 <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
-            AllowSorting="true" Data="@educationals" TItem="EducationalPrograms" ColumnWidth="150px">
+            AllowSorting="true" Data="@сonclusions" TItem="Region" ColumnWidth="150px">
     <Columns>
-        <RadzenGridColumn TItem="EducationalPrograms" Property="Name" Title="Наименование"></RadzenGridColumn>
-        <RadzenGridColumn TItem="EducationalPrograms" Property="Desc" Title="Примечание"></RadzenGridColumn>
+        <RadzenGridColumn TItem="Region" Property="Name" Title="Наименование"></RadzenGridColumn>
+      
 
         @*<RadzenGridColumn TItem="IdentityRole" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">*@
-        <RadzenGridColumn TItem="EducationalPrograms" TextAlign="Radzen.TextAlign.Center" Title="Редактировать" Width="60px">
-            <Template Context="educational">
-                <RadzenButton Click="@(args => Edit(educational))"> <span class="oi oi-pencil" aria-hidden="true"></span> </RadzenButton>
+        <RadzenGridColumn TItem="Region" TextAlign="Radzen.TextAlign.Center" Width="60px" Title="Редактировать">
+            <Template Context="сonclusion">
+                <RadzenButton Click="@(args => Edit(сonclusion))"> <span class="oi oi-pencil" aria-hidden="true"></span> </RadzenButton>
             </Template>
         </RadzenGridColumn>
-        <RadzenGridColumn TItem="EducationalPrograms" TextAlign="Radzen.TextAlign.Center" Title="Удалить" Width="60px">
-            <Template Context="educational">
-                <RadzenButton Click="@(args => Delete(educational))"><span class="oi oi-trash" aria-hidden="true"></span></RadzenButton>
+        <RadzenGridColumn TItem="Region" TextAlign="Radzen.TextAlign.Center" Width="60px" Title="Удалить">
+            <Template Context="сonclusion">
+                <RadzenButton Click="@(args => Delete(сonclusion))"><span class="oi oi-trash" aria-hidden="true"></span></RadzenButton>
             </Template>
         </RadzenGridColumn>
     </Columns>
@@ -50,13 +50,10 @@
                     <table class="table">
                         <tr>
                             <td>Наименование</td>
-                            <td><input type="text" class="form-control" @bind="@educational.Name" /></td>
+                            <td><input type="text" class="form-control" @bind="@сonclusion.Name" /></td>
                         </tr>
 
-                        <tr>
-                            <td>Примечание</td>
-                            <td><input type="text" class="form-control" @bind="@educational.Desc" /></td>
-                        </tr>
+                      
                         <tr>
                             <td>
                                 <button class="btn btn-primary" @onclick="Save">
@@ -76,9 +73,9 @@
 
 @code {
 
-    private List<EducationalPrograms> educationals = new List<EducationalPrograms>();
+    private List<Region> сonclusions = new List<Region>();
 
-    private EducationalPrograms educational = new EducationalPrograms();
+    private Region сonclusion = new Region();
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -92,8 +89,8 @@
 
     void AddNew()
     {
-        educational = new EducationalPrograms();
-        educational.Id = 0;
+        сonclusion = new Region();
+        сonclusion.Id = 0;
         title = "Новоя запись";
         ShowPopup = true;
     }
@@ -101,16 +98,16 @@
     {
         try
         {
-            if (educational.Id != 0)
+            if (сonclusion.Id != 0)
             {
-                EducationalPrograms lt = await db.EducationalPrograms.FindAsync(educational.Id);
-                lt.Name = educational.Name;
-                lt.Desc = educational.Desc;
+                Region lt = await db.Region.FindAsync(сonclusion.Id);
+                lt.Name = сonclusion.Name;
+              
                 await db.SaveChangesAsync();
             }
             else
             {
-                db.EducationalPrograms.Add(educational);
+                db.Region.Add(сonclusion);
                 await db.SaveChangesAsync();
             }
 
@@ -122,19 +119,19 @@
             strError = ex.GetBaseException().Message;
         }
     }
-    async Task Edit(EducationalPrograms lt)
+    async Task Edit(Region lt)
     {
         title = "Редактирование";
-        educational = lt;
+        сonclusion = lt;
         ShowPopup = true;
     }
-    async Task Delete(EducationalPrograms lt)
+    async Task Delete(Region lt)
     {
         ShowPopup = false;
-        var obj = await db.EducationalPrograms.FindAsync(lt.Id);
+        var obj = await db.Region.FindAsync(lt.Id);
         if (obj != null)
         {
-            db.EducationalPrograms.Remove(obj);
+            db.Region.Remove(obj);
             await db.SaveChangesAsync();
         }
         LoadData();
@@ -153,8 +150,8 @@
 
     public void LoadData()
     {
-        educational = new EducationalPrograms();
-        educationals = db.EducationalPrograms.OrderBy(x => x.Name).ToList();
+        сonclusion = new Region();
+        сonclusions = db.Region.OrderBy(x => x.Name).ToList();
 
     }
 

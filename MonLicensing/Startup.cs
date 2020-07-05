@@ -89,6 +89,7 @@ namespace MonLicensing
                 endpoints.MapFallbackToPage("/_Host");
             });
             CreateRoles(serviceProvider, db).Wait();
+            DataSeeder.SeedCountries(db);
         }
 
         private async Task CreateRoles(IServiceProvider serviceProvider, ApplicationDbContext db)
@@ -126,6 +127,7 @@ namespace MonLicensing
 
                 }
             }
+          
         }
     }
 }

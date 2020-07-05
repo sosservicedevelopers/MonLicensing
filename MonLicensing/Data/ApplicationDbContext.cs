@@ -16,9 +16,11 @@ namespace MonLicensing.Data
         public DbSet<Reissuining> Reissuining { get; set; }
         public DbSet<ImpactMeasures> ImpactMeasures { get; set; }
 
-        public DbSet<Processes> Processes { get; set; }
-        public DbSet<LicenceType> LicenceType { get; set; }
 
+        public DbSet<Processes> Processes { get; set; }
+        public DbSet<Region> Region { get; set; }
+        public DbSet<District> District { get; set; }
+        public DbSet<SobsForm> SobsForm { get; set; }
 
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)

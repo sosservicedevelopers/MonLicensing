@@ -121,20 +121,6 @@ namespace MonLicensing.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LicenceType",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(maxLength: 150, nullable: false),
-                    Desc = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LicenceType", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Processes",
                 columns: table => new
                 {
@@ -149,6 +135,19 @@ namespace MonLicensing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Region",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Region", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Reissuining",
                 columns: table => new
                 {
@@ -160,6 +159,20 @@ namespace MonLicensing.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reissuining", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SobsForm",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(maxLength: 150, nullable: false),
+                    Desc = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SobsForm", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -268,6 +281,26 @@ namespace MonLicensing.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "District",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(nullable: false),
+                    RegionId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_District", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_District_Region_RegionId",
+                        column: x => x.RegionId,
+                        principalTable: "Region",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -304,6 +337,11 @@ namespace MonLicensing.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_District_RegionId",
+                table: "District",
+                column: "RegionId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -330,6 +368,9 @@ namespace MonLicensing.Migrations
                 name: "Denial");
 
             migrationBuilder.DropTable(
+                name: "District");
+
+            migrationBuilder.DropTable(
                 name: "EducationalPrograms");
 
             migrationBuilder.DropTable(
@@ -339,19 +380,22 @@ namespace MonLicensing.Migrations
                 name: "LegalForm");
 
             migrationBuilder.DropTable(
-                name: "LicenceType");
-
-            migrationBuilder.DropTable(
                 name: "Processes");
 
             migrationBuilder.DropTable(
                 name: "Reissuining");
 
             migrationBuilder.DropTable(
+                name: "SobsForm");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Region");
         }
     }
 }

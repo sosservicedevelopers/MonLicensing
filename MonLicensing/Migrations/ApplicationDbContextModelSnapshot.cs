@@ -266,6 +266,27 @@ namespace MonLicensing.Migrations
                     b.ToTable("Denial");
                 });
 
+            modelBuilder.Entity("MonLicensing.Models.District", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("RegionId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RegionId");
+
+                    b.ToTable("District");
+                });
+
             modelBuilder.Entity("MonLicensing.Models.EducationalPrograms", b =>
                 {
                     b.Property<int>("Id")
@@ -326,26 +347,6 @@ namespace MonLicensing.Migrations
                     b.ToTable("LegalForm");
                 });
 
-            modelBuilder.Entity("MonLicensing.Models.LicenceType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("Desc")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("character varying(150)")
-                        .HasMaxLength(150);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("LicenceType");
-                });
-
             modelBuilder.Entity("MonLicensing.Models.Processes", b =>
                 {
                     b.Property<int>("Id")
@@ -366,6 +367,21 @@ namespace MonLicensing.Migrations
                     b.ToTable("Processes");
                 });
 
+            modelBuilder.Entity("MonLicensing.Models.Region", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Region");
+                });
+
             modelBuilder.Entity("MonLicensing.Models.Reissuining", b =>
                 {
                     b.Property<int>("Id")
@@ -384,6 +400,26 @@ namespace MonLicensing.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Reissuining");
+                });
+
+            modelBuilder.Entity("MonLicensing.Models.SobsForm", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("Desc")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("character varying(150)")
+                        .HasMaxLength(150);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SobsForm");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -433,6 +469,15 @@ namespace MonLicensing.Migrations
                     b.HasOne("MonLicensing.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("MonLicensing.Models.District", b =>
+                {
+                    b.HasOne("MonLicensing.Models.Region", "Region")
+                        .WithMany()
+                        .HasForeignKey("RegionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

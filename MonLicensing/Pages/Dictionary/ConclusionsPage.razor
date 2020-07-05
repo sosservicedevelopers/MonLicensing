@@ -1,4 +1,5 @@
 ﻿@page "/conclusionlist"
+@attribute [Authorize]
 
 @using Microsoft.AspNetCore.Identity;
 @using MonLicensing.Data
@@ -9,21 +10,21 @@
 @inject ApplicationDbContext db
 
 
-    <h3>Заключения уполномоченного государственного органа</h3>
+<h3>Заключения уполномоченного государственного органа</h3>
 <button class="btn btn-success" @onclick="AddNew">Добавить новый</button>
-<RadzenGrid AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+<RadzenGrid AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
             AllowSorting="true" Data="@сonclusions" TItem="Conclusions" ColumnWidth="150px">
     <Columns>
         <RadzenGridColumn TItem="Conclusions" Property="Name" Title="Наименование"></RadzenGridColumn>
         <RadzenGridColumn TItem="Conclusions" Property="Desc" Title="Примечание"></RadzenGridColumn>
-      
+
         @*<RadzenGridColumn TItem="IdentityRole" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">*@
-        <RadzenGridColumn TItem="Conclusions" TextAlign="Radzen.TextAlign.Center" Width="60px"  Title="Редактировать">
+        <RadzenGridColumn TItem="Conclusions" TextAlign="Radzen.TextAlign.Center" Width="60px" Title="Редактировать">
             <Template Context="сonclusion">
                 <RadzenButton Click="@(args => Edit(сonclusion))"> <span class="oi oi-pencil" aria-hidden="true"></span> </RadzenButton>
             </Template>
         </RadzenGridColumn>
-        <RadzenGridColumn TItem="Conclusions" TextAlign="Radzen.TextAlign.Center" Width="60px"Title="Удалить">
+        <RadzenGridColumn TItem="Conclusions" TextAlign="Radzen.TextAlign.Center" Width="60px" Title="Удалить">
             <Template Context="сonclusion">
                 <RadzenButton Click="@(args => Delete(сonclusion))"><span class="oi oi-trash" aria-hidden="true"></span></RadzenButton>
             </Template>
@@ -75,7 +76,8 @@
 
 @code {
 
-    private List<Conclusions> сonclusions= new List<Conclusions>();
+
+    private List<Conclusions> сonclusions = new List<Conclusions>();
 
     private Conclusions сonclusion = new Conclusions();
 
@@ -104,7 +106,7 @@
             {
                 Conclusions lt = await db.Conclusions.FindAsync(сonclusion.Id);
                 lt.Name = сonclusion.Name;
-                lt.Desc= сonclusion.Desc;
+                lt.Desc = сonclusion.Desc;
                 await db.SaveChangesAsync();
             }
             else

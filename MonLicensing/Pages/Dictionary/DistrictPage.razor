@@ -1,5 +1,9 @@
-﻿@page "/imlist"
+﻿@page "/districtlist"
 @attribute [Authorize]
+
+
+@using System.Linq.Dynamic.Core
+
 
 @using Microsoft.AspNetCore.Identity;
 @using MonLicensing.Data
@@ -10,21 +14,21 @@
 @inject ApplicationDbContext db
 
 
-<h3>Меры воздействия</h3>
+<h3>Процессы</h3>
 <button class="btn btn-success" @onclick="AddNew">Добавить новый</button>
 <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
-            AllowSorting="true" Data="@сonclusions" TItem="ImpactMeasures" ColumnWidth="150px">
+            AllowSorting="true" Data="@сonclusions" TItem="District" ColumnWidth="150px">
     <Columns>
-        <RadzenGridColumn TItem="ImpactMeasures" Property="Name" Title="Наименование"></RadzenGridColumn>
-        <RadzenGridColumn TItem="ImpactMeasures" Property="Desc" Title="Примечание"></RadzenGridColumn>
+        <RadzenGridColumn TItem="District" Property="Name" Title="Наименование"></RadzenGridColumn>
+        <RadzenGridColumn TItem="District" Property="Region" Title="Примечание"></RadzenGridColumn>
 
         @*<RadzenGridColumn TItem="IdentityRole" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">*@
-        <RadzenGridColumn TItem="ImpactMeasures" TextAlign="Radzen.TextAlign.Center" Title="Редактировать" Width="60px">
+        <RadzenGridColumn TItem="District" TextAlign="Radzen.TextAlign.Center" Title="Редактировать" Width="60px">
             <Template Context="сonclusion">
                 <RadzenButton Click="@(args => Edit(сonclusion))"> <span class="oi oi-pencil" aria-hidden="true"></span> </RadzenButton>
             </Template>
         </RadzenGridColumn>
-        <RadzenGridColumn TItem="ImpactMeasures" TextAlign="Radzen.TextAlign.Center" Title="Удалить" Width="60px">
+        <RadzenGridColumn TItem="District" TextAlign="Radzen.TextAlign.Center" Title="Удалить" Width="60px">
             <Template Context="сonclusion">
                 <RadzenButton Click="@(args => Delete(сonclusion))"><span class="oi oi-trash" aria-hidden="true"></span></RadzenButton>
             </Template>
@@ -32,6 +36,11 @@
     </Columns>
 </RadzenGrid>
 
+<h1>Dropdown</h1>
+<RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true"
+                        Data="@(customers.Select(c => new { RegionID = c.Id, Region = c.Name }).Distinct().AsQueryable())"
+                        TextProperty="Region" ValueProperty="RegionId" Style="margin-bottom: 20px"
+                        Change="@(args => Change(args, "DropDownDataGrid"))" />
 
 @if (ShowPopup)
 {
@@ -55,7 +64,7 @@
 
                         <tr>
                             <td>Примечание</td>
-                            <td><input type="text" class="form-control" @bind="@сonclusion.Desc" /></td>
+                         
                         </tr>
                         <tr>
                             <td>
@@ -76,9 +85,68 @@
 
 @code {
 
-    private List<ImpactMeasures> сonclusions = new List<ImpactMeasures>();
+    private List<District> сonclusions = new List<District>();
 
-    private ImpactMeasures сonclusion = new ImpactMeasures();
+    private District сonclusion = new District();
+
+
+    IEnumerable<Region> customers;
+
+    IEnumerable<string> multipleValues;
+    string value;
+
+    int count;
+    IEnumerable<Region> customCustomersData;
+
+    protected override void OnInitialized()
+    {
+        customers = db.Region.ToList();
+    }
+
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void Change(object value, string name)
+    {
+        var str = value is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)value) : value;
+
+        events.Add(DateTime.Now, $"{name} value changed to {str}");
+        StateHasChanged();
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var query = db.Region.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(c => c.Name.Contains(args.Filter));
+        }
+
+        count = query.Count();
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        if (args.Skip != null)
+        {
+            query = query.Skip(args.Skip.Value);
+        }
+
+        if (args.Top != null)
+        {
+            query = query.Take(args.Top.Value);
+        }
+
+        customCustomersData = query;
+
+        InvokeAsync(StateHasChanged);
+    }
+
+
+
+
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -92,7 +160,7 @@
 
     void AddNew()
     {
-        сonclusion = new ImpactMeasures();
+        сonclusion = new District();
         сonclusion.Id = 0;
         title = "Новоя запись";
         ShowPopup = true;
@@ -103,14 +171,14 @@
         {
             if (сonclusion.Id != 0)
             {
-                ImpactMeasures lt = await db.ImpactMeasures.FindAsync(сonclusion.Id);
+                District lt = await db.District.FindAsync(сonclusion.Id);
                 lt.Name = сonclusion.Name;
-                lt.Desc = сonclusion.Desc;
+                lt.RegionId = сonclusion.RegionId;
                 await db.SaveChangesAsync();
             }
             else
             {
-                db.ImpactMeasures.Add(сonclusion);
+                db.District.Add(сonclusion);
                 await db.SaveChangesAsync();
             }
 
@@ -122,19 +190,19 @@
             strError = ex.GetBaseException().Message;
         }
     }
-    async Task Edit(ImpactMeasures lt)
+    async Task Edit(District lt)
     {
         title = "Редактирование";
         сonclusion = lt;
         ShowPopup = true;
     }
-    async Task Delete(ImpactMeasures lt)
+    async Task Delete(District lt)
     {
         ShowPopup = false;
-        var obj = await db.ImpactMeasures.FindAsync(lt.Id);
+        var obj = await db.District.FindAsync(lt.Id);
         if (obj != null)
         {
-            db.ImpactMeasures.Remove(obj);
+            db.District.Remove(obj);
             await db.SaveChangesAsync();
         }
         LoadData();
@@ -153,10 +221,14 @@
 
     public void LoadData()
     {
-        сonclusion = new ImpactMeasures();
-        сonclusions = db.ImpactMeasures.OrderBy(x => x.Name).ToList();
+        сonclusion = new District();
+        сonclusions = db.District.OrderBy(x => x.Name).ToList();
 
     }
+
+
+
+
 
 
 }
