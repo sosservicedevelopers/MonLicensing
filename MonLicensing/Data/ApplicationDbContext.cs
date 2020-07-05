@@ -21,7 +21,7 @@ namespace MonLicensing.Data
         public DbSet<Region> Region { get; set; }
         public DbSet<District> District { get; set; }
         public DbSet<SobsForm> SobsForm { get; set; }
-
+        public DbSet<Request> Request { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

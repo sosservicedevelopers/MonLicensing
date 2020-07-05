@@ -49,7 +49,7 @@ namespace MonLicensing.Models
 
         [Display(Name = "Код ОКПО юридического лица  ")]
         [Required(ErrorMessage = "Обязательное поле")]
-        [StringLength(maximumLength: 8, MinimumLength = 8, ErrorMessage = "Инн должен быть 8 знаков")]
+        [StringLength(maximumLength: 8, MinimumLength =8, ErrorMessage = "Инн должен быть 8 знаков")]
         public string OKPO { get; set; }
 
         [Display(Name = "Дата регистрации (перерегистрации) юридического лица ")]
@@ -58,8 +58,9 @@ namespace MonLicensing.Models
         public DateTime? RegistrationDate { get; set; }
 
         [Display(Name = "Номер телефона (факса) заявителя ")]
+        [Required(ErrorMessage = "Обязательное поле")]
         public string PhoneNumber { get; set; }
-
+        [Required(ErrorMessage = "Обязательное поле")]
         [Display(Name = "Адрес электронной почты заявителя ")]
         public string Email { get; set; }
 

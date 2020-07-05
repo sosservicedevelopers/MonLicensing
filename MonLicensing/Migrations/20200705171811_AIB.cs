@@ -301,6 +301,54 @@ namespace MonLicensing.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Request",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(maxLength: 150, nullable: false),
+                    LegalFormId = table.Column<int>(nullable: true),
+                    SobsFormId = table.Column<int>(nullable: true),
+                    RegionId = table.Column<int>(nullable: true),
+                    DistrictId = table.Column<int>(nullable: true),
+                    Adres = table.Column<string>(nullable: true),
+                    INN = table.Column<string>(maxLength: 14, nullable: false),
+                    OKPO = table.Column<string>(maxLength: 8, nullable: false),
+                    RegistrationDate = table.Column<DateTime>(nullable: true),
+                    PhoneNumber = table.Column<string>(nullable: false),
+                    Email = table.Column<string>(nullable: false),
+                    СompletionDate = table.Column<DateTime>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Request", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Request_District_DistrictId",
+                        column: x => x.DistrictId,
+                        principalTable: "District",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Request_LegalForm_LegalFormId",
+                        column: x => x.LegalFormId,
+                        principalTable: "LegalForm",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Request_Region_RegionId",
+                        column: x => x.RegionId,
+                        principalTable: "Region",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Request_SobsForm_SobsFormId",
+                        column: x => x.SobsFormId,
+                        principalTable: "SobsForm",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -342,6 +390,26 @@ namespace MonLicensing.Migrations
                 name: "IX_District_RegionId",
                 table: "District",
                 column: "RegionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Request_DistrictId",
+                table: "Request",
+                column: "DistrictId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Request_LegalFormId",
+                table: "Request",
+                column: "LegalFormId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Request_RegionId",
+                table: "Request",
+                column: "RegionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Request_SobsFormId",
+                table: "Request",
+                column: "SobsFormId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -368,16 +436,10 @@ namespace MonLicensing.Migrations
                 name: "Denial");
 
             migrationBuilder.DropTable(
-                name: "District");
-
-            migrationBuilder.DropTable(
                 name: "EducationalPrograms");
 
             migrationBuilder.DropTable(
                 name: "ImpactMeasures");
-
-            migrationBuilder.DropTable(
-                name: "LegalForm");
 
             migrationBuilder.DropTable(
                 name: "Processes");
@@ -386,13 +448,22 @@ namespace MonLicensing.Migrations
                 name: "Reissuining");
 
             migrationBuilder.DropTable(
-                name: "SobsForm");
+                name: "Request");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "District");
+
+            migrationBuilder.DropTable(
+                name: "LegalForm");
+
+            migrationBuilder.DropTable(
+                name: "SobsForm");
 
             migrationBuilder.DropTable(
                 name: "Region");

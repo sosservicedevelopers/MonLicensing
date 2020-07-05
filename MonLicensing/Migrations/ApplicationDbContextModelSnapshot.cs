@@ -402,6 +402,70 @@ namespace MonLicensing.Migrations
                     b.ToTable("Reissuining");
                 });
 
+            modelBuilder.Entity("MonLicensing.Models.Request", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("Adres")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("DistrictId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("INN")
+                        .IsRequired()
+                        .HasColumnType("character varying(14)")
+                        .HasMaxLength(14);
+
+                    b.Property<int?>("LegalFormId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("character varying(150)")
+                        .HasMaxLength(150);
+
+                    b.Property<string>("OKPO")
+                        .IsRequired()
+                        .HasColumnType("character varying(8)")
+                        .HasMaxLength(8);
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("RegionId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("RegistrationDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("SobsFormId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("СompletionDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DistrictId");
+
+                    b.HasIndex("LegalFormId");
+
+                    b.HasIndex("RegionId");
+
+                    b.HasIndex("SobsFormId");
+
+                    b.ToTable("Request");
+                });
+
             modelBuilder.Entity("MonLicensing.Models.SobsForm", b =>
                 {
                     b.Property<int>("Id")
@@ -480,6 +544,25 @@ namespace MonLicensing.Migrations
                         .HasForeignKey("RegionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("MonLicensing.Models.Request", b =>
+                {
+                    b.HasOne("MonLicensing.Models.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId");
+
+                    b.HasOne("MonLicensing.Models.LegalForm", "LegalForm")
+                        .WithMany()
+                        .HasForeignKey("LegalFormId");
+
+                    b.HasOne("MonLicensing.Models.Region", "Region")
+                        .WithMany()
+                        .HasForeignKey("RegionId");
+
+                    b.HasOne("MonLicensing.Models.SobsForm", "SobsForm")
+                        .WithMany()
+                        .HasForeignKey("SobsFormId");
                 });
 #pragma warning restore 612, 618
         }

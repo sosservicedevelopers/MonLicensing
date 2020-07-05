@@ -1,1 +1,325 @@
 ﻿@page "/requestlist"
+
+@attribute [Authorize]
+
+
+@using System.Linq.Dynamic.Core
+
+
+@using Microsoft.AspNetCore.Identity;
+@using MonLicensing.Data
+@using MonLicensing.Models
+@using Radzen.Blazor;
+@inject UserManager<ApplicationUser> _userManager;
+
+@inject ApplicationDbContext db
+@*<h1>Dropdown</h1>
+    <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true"
+                            Data="@(customers.Select(c => new { RegionID = c.Id, Region = c.Name }).Distinct().AsQueryable())"
+                            TextProperty="Region" ValueProperty="RegionId" Style="margin-bottom: 20px"
+                            Change="@(args => Change(args, "DropDownDataGrid"))" />*@
+
+    <div class="row">
+        <div class="col-md-2">
+        </div>
+            <div class="col-md-6">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="CreateDate" />
+
+                    <input type="hidden" asp-for="ApplicationUserId" />
+
+                    <div class="form-group">
+                        <label class="control-label">Полное наименование юридического лица</label>
+                        <input type="text" class="form-control" @bind="@request.Name" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Организационно-правовая форма</label>
+                        <select class="form-control" @bind="@request.LegalFormId">
+                            @foreach (var cnt in legalForms)
+                            {
+                                <option value="@cnt.Id">@cnt.Name</option>
+                            }
+                        </select>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="control-label"> Форма собственности</label>
+                        <select class="form-control" @bind="@request.SobsFormId">
+                            @foreach (var cnt in sobsForm)
+                            {
+                                <option value="@cnt.Id">@cnt.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label"> Область</label>
+                        <select class="form-control" @bind="@request.RegionId">
+                            @foreach (var cnt in regions)
+                            {
+                                <option value="@cnt.Id">@cnt.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label"> Район</label>
+                        <select class="form-control" @bind="@request.DistrictId">
+                            @foreach (var cnt in districts)
+                            {
+                                <option value="@cnt.Id">@cnt.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Улица и т.д."</label>
+                        <input type="text" class="form-control" @bind="@request.Adres" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Идентификационный номер налогоплательщика (ИНН)</label>
+                        <input type="text" class="form-control" @bind="@request.INN" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label"> Код ОКПО юридического лица</label>
+                        <input type="text" class="form-control" @bind="@request.OKPO" />
+                        <span asp-validation-for="OKPO" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label"> Номер телефона (факса) заявителя</label>
+                        <input type="text" class="form-control" @bind="@request.PhoneNumber" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label"> Адрес электронной почты заявителя</label>
+                        <input type="text" class="form-control" @bind="@request.Email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    @*<div class="form-group">
+                        <label asp-for="СompletionDate" class="control-label">Дата заполнения </label>
+                        <input asp-for="СompletionDate" class="form-control" />
+                        <span asp-validation-for="СompletionDate" class="text-danger"></span>
+                    </div>*@
+                    <div class="form-group">
+                        <label class="control-label"> Дата заполнения </label>
+
+                        <InputDate @bind-Value="request.СompletionDate" class="form-control"/>
+                    </div>
+                    <button class="btn btn-primary" @onclick="Save">
+                        Отправить
+                    </button>
+                </form>
+            </div>
+        </div>
+
+
+        <button class="btn btn-success" @onclick="AddNew">Заявка</button>
+
+
+        @*@if (ShowPopup)
+        {
+            <div class="modal" tabindex="-1" style="display:block" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title">@title</h3>
+                            <button type="button" class="close"
+                                    @onclick="ClosePopup">
+                                <span aria-hidden="true">X</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <span style="color:red">@strError</span>
+                            <table class="table">
+                                <tr>
+                                    <td>Полное наименование юридического лица</td>
+                                    <td><input type="text" class="form-control" @bind="@request.Name" /></td>
+                                </tr>
+
+                                <tr>
+                                    <td>Организационно-правовая форма</td>
+                                    <td>
+                                        <select class="form-control" @bind="@request.LegalFormId">
+                                            @foreach (var cnt in legalForms)
+                                            {
+                                                <option value="@cnt.Id">@cnt.Name</option>
+                                            }
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Форма собственности</td>
+                                    <td>
+                                        <select class="form-control" @bind="@request.SobsFormId">
+                                            @foreach (var cnt in sobsForm)
+                                            {
+                                                <option value="@cnt.Id">@cnt.Name</option>
+                                            }
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Область</td>
+                                    <td>
+                                        <select class="form-control" @bind="@request.RegionId">
+                                            @foreach (var cnt in regions)
+                                            {
+                                                <option value="@cnt.Id">@cnt.Name</option>
+                                            }
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Район</td>
+                                    <td>
+                                        <select class="form-control" @bind="@request.DistrictId">
+                                            @foreach (var cnt in districts)
+                                            {
+                                                <option value="@cnt.Id">@cnt.Name</option>
+                                            }
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Улица и т.д."</td>
+                                    <td><input type="text" class="form-control" @bind="@request.Adres" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Идентификационный номер налогоплательщика (ИНН)</td>
+                                    <td><input type="text" class="form-control" @bind="@request.INN" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Код ОКПО юридического лица</td>
+                                    <td><input type="text" class="form-control" @bind="@request.OKPO" /></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <button class="btn btn-primary" @onclick="Save">
+                                            Сохранить
+                                        </button>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        }*@
+
+
+        @code {
+
+            private List<Request> requests = new List<Request>();
+
+            private Request request = new Request();
+
+            IEnumerable<string> multipleValues;
+            string value;
+
+            int count;
+            List<LegalForm> legalForms;
+
+            List<SobsForm> sobsForm;
+            List<Region> regions;
+            List<District> districts;
+
+            void LoadData()
+            {
+                request = new Request();
+                requests = db.Request.ToList();
+            }
+
+
+
+
+
+            [CascadingParameter]
+            private Task<AuthenticationState> authenticationStateTask { get; set; }
+            System.Security.Claims.ClaimsPrincipal CurrentUser;
+
+            ApplicationUser objUser;
+            string strError = "";
+            string title = "";
+            bool ShowPopup = false;
+
+
+            void AddNew()
+            {
+                request = new Request();
+                request.Id = 0;
+                title = "Новоя запись";
+                ShowPopup = true;
+            }
+            async Task Save()
+            {
+                try
+                {
+                    if (request.Id != 0)
+                    {
+                        Request lt = await db.Request.FindAsync(request.Id);
+                        lt.Name = request.Name;
+                        lt.LegalFormId = request.LegalFormId;
+                        lt.SobsFormId = request.SobsFormId;
+                        lt.RegionId = request.RegionId;
+                        lt.DistrictId = request.DistrictId;
+                        lt.Adres = request.Adres;
+                        lt.INN = request.INN;
+                        lt.OKPO = request.OKPO;
+                        lt.PhoneNumber = request.PhoneNumber;
+                        lt.Email = request.Email;
+                        lt.СompletionDate = request.СompletionDate;
+                        await db.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        db.Request.Add(request);
+                        await db.SaveChangesAsync();
+                    }
+
+                    ShowPopup = false;
+                    LoadData();
+                }
+                catch (Exception ex)
+                {
+                    strError = ex.GetBaseException().Message;
+                }
+            }
+            async Task Edit(Request lt)
+            {
+                title = "Редактирование";
+                request = lt;
+                ShowPopup = true;
+            }
+            async Task Delete(Request lt)
+            {
+                ShowPopup = false;
+                var obj = await db.Request.FindAsync(lt.Id);
+                if (obj != null)
+                {
+                    db.Request.Remove(obj);
+                    await db.SaveChangesAsync();
+                }
+                LoadData();
+            }
+            void ClosePopup()
+            {
+                ShowPopup = false;
+            }
+
+            protected override async Task OnInitializedAsync()
+            {
+                legalForms = db.LegalForm.ToList();
+                sobsForm = db.SobsForm.ToList();
+                regions = db.Region.ToList();
+                districts = db.District.ToList();
+                LoadData();
+            }
+
+
+
+
+
+        }
